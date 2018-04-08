@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dyuanit.atm.springbootatm.dao.UserDao">
+
+    <!--自定义字段映射关系-->
+    <resultMap id="userResultMap" type="com.dyuanit.atm.springbootatm.entity.User">
+        <!--property类属性，column数据库列名-->
+        <id property="id" column="id"/>
+        <result property="loginCode" column="login_code"/>
+        <result property="userName" column="user_name"/>
+        <result property="password" column="password"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="user_filed">
+        id, login_code,user_name, password,create_time
+    </sql>
+
+    <select id="getUserByloginCode" resultMap="userResultMap">
+        select <include refid="user_filed"></include>  from atm_user
+        where login_code = #{loginName}
+    </select>
+    <select id="listCardByUserId" resultMap="userResultMap">
+        SELECT id, login_code,user_name, password,create_time from atm_card where user_id=#{userId} order by create_time desc
+    </select>
+
+    <insert id="insertUser"  parameterType="com.dyuanit.atm.springbootatm.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO atm_user(login_code,password,user_name,create_time)
+        VALUES(#{loginCode},#{password},#{userName}, now())
+    </insert>
+
+    <select id="selectUserById" resultMap="userResultMap">
+        SELECT * from atm_user WHERE id=#{userId}
+    </select>
+</mapper>

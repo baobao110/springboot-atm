@@ -1,0 +1,241 @@
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+
+</head>
+
+<body data-type="index">
+
+<div class="am-g tpl-g">
+    <!-- 头部 -->
+    <div th:insert="common/header:: copy"></div>
+    <!-- 风格切换 -->
+
+    <!-- 侧边导航栏 -->
+    <div th:insert="common/left:: leftpalce"></div>
+
+
+
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+
+        <div class="row-content am-cf">
+            <div class="row  am-cf">
+
+                <div class="row">
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                        <div class="widget am-cf">
+                            <div class="widget-head am-cf">
+                                <div class="widget-title am-fl">流水操作</div>
+                                <div class="widget-function am-fr">
+                                    <a href="javascript:;" class="am-icon-cog"></a>
+                                </div>
+                            </div>
+                            <div class="widget-body am-fr">
+
+                                <form class="am-form tpl-form-line-form">
+
+
+                                    <div class="am-form-group">
+                                        <label for="user-phone" class="am-u-sm-3 am-form-label">银行卡 <span
+                                                class="tpl-form-line-small-title"></span></label>
+                                        <div class="am-u-sm-9">
+                                            <select data-am-selected="{searchBox: 1}" style="display: none;" id="cardDiv">
+                                            </select>
+                                            <button type="button" class="am-btn am-btn-default am-radius" onclick="listFlow(1);">查询</button>
+                                            <a id="downFlowDom" href="###" onclick="downFlow();">下载流水</a>
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="am-form-group">
+                                        <label for="pwd" class="am-u-sm-3 am-form-label">密码 <span
+                                                class="tpl-form-line-small-title"></span></label>
+                                        <div class="am-u-sm-9">
+                                            <input type="password" class="tpl-form-input" id="pwd"
+                                                   placeholder="请输入6位银行卡密码">
+                                            <small></small>
+                                        </div>
+                                    </div>
+
+
+                                </form>
+
+
+                                <div class="widget am-cf">
+                                    <div class="widget-head am-cf">
+                                        <div class="widget-title am-fl"></div>
+                                        <div class="widget-function am-fr">
+
+                                        </div>
+                                    </div>
+                                    <div class="widget-body  widget-body-lg am-fr">
+
+                                        <table width="100%"
+                                               class="am-table am-table-compact am-table-striped tpl-table-black "
+                                               id="example-r">
+                                            <thead>
+                                            <tr>
+                                                <th>卡号</th>
+                                                <th>金额</th>
+                                                <th>备注</th>
+                                                <th>时间</th>
+
+                                            </tr>
+                                            </thead>
+                                            <tbody id="flowListDiv">
+                                            <tr class="gradeX">
+                                                <td>6222*****196</td>
+                                                <td>800.00</td>
+                                                <td>存款</td>
+                                                <td>2017-12-19</td>
+                                            </tr>
+                                            <!-- more data -->
+                                            </tbody>
+                                        </table>
+
+                                        <ul class="am-pagination">
+                                            <li><a href="###" onclick="first();">首页 &raquo;</a></li>
+                                            <li><a href="###" onclick="pre();">&laquo; 上一页</a></li>
+                                            <li><a href="###" onclick="next();">下一页 &raquo;</a></li>
+                                            <li><a href="###" onclick="last();">尾页 &raquo;</a></li>
+                                            <li>1/20
+
+                                            </li>
+                                        </ul>
+
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+</div>
+</div>
+<script th:src="@{/js/amazeui.min.js}"></script>
+<script th:src="@{/js/amazeui.datatables.min.js}"></script>
+<script th:src="@{/js/dataTables.responsive.min.js}"></script>
+<script th:src="@{/js/app.js}"></script>
+<script>
+    var currPage = 1;
+    var totalPage = 0;
+
+    $(document).ready(function () {
+        loadBankCard();
+    });
+
+    function last() {
+        currPage = totalPage;
+        listFlow(currPage);
+    }
+
+    function first() {
+        currPage = 1;
+        listFlow(currPage);
+    }
+    function pre() {
+        if (currPage <= 1) {
+            return false;
+        }
+        currPage -= 1;
+        listFlow(currPage);
+    }
+
+    function next() {
+        if (currPage >= totalPage) {
+            return false;
+        }
+        currPage += 1;
+        listFlow(currPage);
+    }
+
+    function downFlow() {
+        $('#downFlowDom').attr('href','/downFlow?cardNum=' + $('#cardDiv').val() + "&pwd=" + $('#pwd').val());
+    }
+    
+    function listFlow(currPage) {
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : '/listFlow',
+            data : {
+                currentPage : currPage,
+                pwd : $('#pwd').val(),
+                cardNo : $('#cardDiv').val()
+            },
+            success : function(dataResult) {
+                if (!dataResult.success) {
+                    alert(dataResult.message);
+                    return false;
+                }
+
+                var results = dataResult.data.data;
+                totalPage = dataResult.data.totalPage;
+
+                var msg = '没有数据';
+
+                for (var i=0; i<results.length;i++) {
+                    var flow = results[i];
+                    msg += '<tr class="gradeX">';
+                    msg += '<td>'+flow.cardNum+'</td>';
+                    msg += '<td>'+flow.wallet+'</td>';
+                    msg += '<td>'+flow.tradeType+'</td>';
+                    msg += '<td>'+flow.createTime+'</td>';
+                    msg += '</tr>';
+                }
+
+                $('#flowListDiv').html(msg);
+            },
+            error : function(XMLHttpResponse) {
+            }
+        });
+    }
+
+    function loadBankCard() {
+        $.ajax({
+            type : "POST",
+            dataType : "json",
+            url : '/listBankCard',
+            data : {
+            },
+            success : function(dataResult) {
+                if (!dataResult.success) {
+                    alert(dataResult.message);
+                    return false;
+                }
+
+                var cards = dataResult.data;
+                var msg = '<option value="-1">请选择银行卡</option>';
+                for (var i=0; i<cards.length;i++) {
+                    msg += '<option value="'+cards[i].cardNo+'">'+cards[i].cardNo+'</option>';
+                }
+
+                $('#cardDiv').html(msg);
+            },
+            error : function(XMLHttpResponse) {
+            }
+        });
+    }
+</script>
+
+</body>
+
+</html>

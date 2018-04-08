@@ -1,0 +1,169 @@
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+</head>
+
+<body data-type="index">
+<div class="am-g tpl-g">
+    <!-- 头部 -->
+    <div th:insert="common/header:: copy"></div>
+    <!-- 风格切换 -->
+
+    <!-- 侧边导航栏 -->
+    <div th:insert="common/left:: leftpalce"></div>
+
+
+
+    <!-- 内容区域 -->
+    <div class="tpl-content-wrapper">
+
+        <div class="row-content am-cf">
+            <div class="row  am-cf">
+
+                <div class="row">
+
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                        <div class="widget am-cf">
+                            <div class="widget-head am-cf">
+                                <div class="widget-title am-fl">转账操作</div>
+                                <div class="widget-function am-fr">
+                                    <a href="javascript:;" class="am-icon-cog"></a>
+                                </div>
+                            </div>
+                            <div class="widget-body am-fr">
+
+                                <form class="am-form tpl-form-line-form" action="/doTransfer" method="post">
+
+
+                                    <div class="am-form-group">
+                                        <label for="user-phone" class="am-u-sm-3 am-form-label">银行卡 <span
+                                                class="tpl-form-line-small-title"></span></label>
+                                        <div class="am-u-sm-9">
+                                            <select data-am-selected="{searchBox: 1}" style="display: none;"
+                                                    id="cardDiv">
+
+                                            </select>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="am-form-group">
+                                        <label for="checkinCardNo" class="am-u-sm-3 am-form-label">转入卡号 <span
+                                                class="tpl-form-line-small-title"></span></label>
+                                        <div class="am-u-sm-9">
+                                            <input type="text" class="tpl-form-input" id="checkinCardNo"
+                                                   placeholder="请输入收款卡号">
+                                            <small></small>
+                                        </div>
+                                    </div>
+
+                                    <div class="am-form-group">
+                                        <label for="wallet" class="am-u-sm-3 am-form-label">转帐金额 <span
+                                                class="tpl-form-line-small-title"></span></label>
+                                        <div class="am-u-sm-9">
+                                            <input type="text" class="tpl-form-input" id="wallet"
+                                                   placeholder="请输入转帐金额">
+                                            <small></small>
+                                        </div>
+                                    </div>
+
+                                    <div class="am-form-group">
+                                        <label for="checkoutCardPassword" class="am-u-sm-3 am-form-label">密码 <span
+                                                class="tpl-form-line-small-title"></span></label>
+                                        <div class="am-u-sm-9">
+                                            <input type="password" class="tpl-form-input" id="checkoutCardPassword"
+                                                   placeholder="请输入6位银行卡密码">
+                                            <small></small>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="am-form-group">
+                                        <div class="am-u-sm-9 am-u-sm-push-3">
+                                            <button type="button" onclick="transfer()"
+                                                    class="am-btn am-btn-primary tpl-btn-bg-color-success ">转账
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+</div>
+</div>
+</div>
+
+<script th:src="@{/js/amazeui.min.js}"></script>
+<script th:src="@{/js/amazeui.datatables.min.js}"></script>
+<script th:src="@{/js/dataTables.responsive.min.js}"></script>
+<script th:src="@{/js/app.js}"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        loadBankCard();
+    });
+
+    function loadBankCard() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: '/listBankCard',
+            data: {},
+            success: function (dataResult) {
+                if (!dataResult.success) {
+                    alert(dataResult.message);
+                    return false;
+                }
+
+                var cards = dataResult.data;
+                var msg = '<option value="-1">请选择银行卡</option>';
+                for (var i = 0; i < cards.length; i++) {
+                    msg += '<option value="' + cards[i].cardNo + '">' + cards[i].cardNo + '</option>';
+                }
+
+                $('#cardDiv').html(msg);
+            },
+            error: function (XMLHttpResponse) {
+            }
+        });
+    }
+
+    function transfer() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: '/doTransfer',
+            data: {
+                checkoutCardNo: $('#cardDiv').val(),
+                checkinCardNo: $('#checkinCardNo').val(),
+                wallet: $('#wallet').val(),
+                checkoutCardPassword: $('#checkoutCardPassword').val()
+            },
+            success: function (dataResult) {
+                if (!dataResult.success) {
+                    alert(dataResult.message);
+                    return false;
+                }
+
+                alert('转账成功!');
+            },
+            error: function (XMLHttpResponse) {
+            }
+        });
+    }
+</script>
+
+</html>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.dyuanit.atm.springbootatm.dao.FlowDao">
+
+    <resultMap id="flowResultMap" type="com.dyuanit.atm.springbootatm.entity.Flow">
+        <id property="id" column="id"/>
+        <result property="cardId" column="card_id"/>
+        <result property="cardNum" column="card_no"/>
+        <result property="wallet" column="wallet"/>
+        <result property="tradeType" column="trade_type"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+
+    <insert id="save">
+        INSERT INTO atm_flow(card_id, card_no, wallet, trade_type, create_time)
+        value(#{cardId},#{cardNum},#{wallet},#{tradeType},now())
+    </insert>
+
+    <select id="listFlow" resultMap="flowResultMap">
+        select * from atm_flow where card_no=#{cardNo} limit #{offset}, #{pageNum};
+    </select>
+
+    <select id="countListFlow" resultType="int">
+        select count(*) from atm_flow where card_no=#{cardNo};
+    </select>
+
+
+</mapper>

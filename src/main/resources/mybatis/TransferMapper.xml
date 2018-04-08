@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dyuanit.atm.springbootatm.dao.TransferMapper">
+  <resultMap id="BaseResultMap" type="com.dyuanit.atm.springbootatm.entity.Transfer">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="out_card" jdbcType="VARCHAR" property="outCard" />
+    <result column="in_card" jdbcType="VARCHAR" property="inCard" />
+    <result column="amount" jdbcType="VARCHAR" property="amount" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, out_card, in_card, amount, status, create_time, modify_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from atm_transfer
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <insert id="insert" parameterType="com.dyuanit.atm.springbootatm.entity.Transfer">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into atm_transfer (out_card, in_card, amount, 
+      status, create_time, modify_time
+      )
+    values (#{outCard,jdbcType=VARCHAR}, #{inCard,jdbcType=VARCHAR}, #{amount,jdbcType=VARCHAR}, 
+      #{status,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{modifyTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <update id="updateStatus">
+    UPDATE atm_transfer set status=#{status} where id=#{id}
+  </update>
+
+  <select id="listTransfer" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"></include>
+    from atm_transfer
+    WHERE status=#{status}
+    and create_time &lt; #{date}
+    order by id
+    limit #{offset}, 2;
+  </select>
+</mapper>
